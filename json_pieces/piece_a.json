@@ -1,0 +1,22 @@
+{
+    "north": {
+        "class_name": "SimpleConnector",
+        "data": {
+            "id": 8
+        }
+    },
+    "east": {
+        "class_name": "SimpleConnector",
+        "data": {
+            "id": 9
+        }
+    },
+    "south": {
+        "class_name": "EdgeConnector",
+        "data": {}
+    },
+    "west": {
+        "class_name": "EdgeConnector",
+        "data": {}
+    }
+}
