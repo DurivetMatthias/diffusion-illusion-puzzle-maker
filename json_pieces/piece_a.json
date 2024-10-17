@@ -2,13 +2,13 @@
     "north": {
         "class_name": "SimpleConnector",
         "data": {
-            "id": 8
+            "id": 1
         }
     },
     "east": {
         "class_name": "SimpleConnector",
         "data": {
-            "id": 9
+            "id": 2
         }
     },
     "south": {

@@ -14,8 +14,8 @@ def get_distinct_colors() -> list[tuple[float, float, float]]:
     random_colors = []
 
     # Generate combinations with varying intensities
-    start = 0
-    stop = 4
+    start = 3
+    stop = start + 4
 
     for r in range(start, stop):
         for g in range(start, stop):

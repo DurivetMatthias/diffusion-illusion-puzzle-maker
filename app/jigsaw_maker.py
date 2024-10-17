@@ -1,18 +1,10 @@
+import itertools
+import math
+
 from app.jigsaw_classes import EdgeConnector
 from app.jigsaw_classes import SimpleConnector
 from app.jigsaw_classes import Piece
-
-used_ids = []
-
-
-def get_unique_id():
-    new_id = max(used_ids, default=0) + 1
-    used_ids.append(new_id)
-    return new_id
-
-
-def make_distinct_simple_connector():
-    return SimpleConnector(get_unique_id())
+from app import visualisation
 
 
 def make_outline_piece():
@@ -25,45 +17,6 @@ def make_outline_piece():
         east=edge_b,
         south=edge_c,
         west=edge_d,
-    )
-
-
-def make_distinct_corner_piece():
-    edge_a = EdgeConnector()
-    edge_b = EdgeConnector()
-    connector_a = make_distinct_simple_connector()
-    connector_b = make_distinct_simple_connector()
-    return Piece(
-        north=connector_a,
-        east=connector_b,
-        south=edge_a,
-        west=edge_b,
-    )
-
-
-def make_distinct_edge_piece():
-    edge_a = EdgeConnector()
-    connector_a = make_distinct_simple_connector()
-    connector_b = make_distinct_simple_connector()
-    connector_c = make_distinct_simple_connector()
-    return Piece(
-        north=connector_a,
-        east=connector_b,
-        south=connector_c,
-        west=edge_a,
-    )
-
-
-def make_distinct_piece():
-    connector_a = make_distinct_simple_connector()
-    connector_b = make_distinct_simple_connector()
-    connector_c = make_distinct_simple_connector()
-    connector_d = make_distinct_simple_connector()
-    return Piece(
-        north=connector_a,
-        east=connector_b,
-        south=connector_c,
-        west=connector_d,
     )
 
 
@@ -107,21 +60,114 @@ class LinkedGrid:
             raise IndexError("Cell out of bounds")
 
 
-def make_puzzle(width, height):
-    outlined_grid = LinkedGrid(width + 2, height + 2)
+def connectors_to_puzzle(
+    width,
+    height,
+    vertical_connector_permutation,
+    horizontal_connector_permutation,
+):
+    pieces = []
+    for y in range(height):
+        for x in range(width):
+            north_connector = None
+            east_connector = None
+            south_connector = None
+            west_connector = None
 
-    # Create an outline of pieces that have flat edges on all sides.
-    # Inside this outline we can then place the regular puzzle pieces.
-    current_cell = outlined_grid.get_cell(0, 0)
-    while current_cell.east:
-        current_cell.piece = make_outline_piece()
-        current_cell = current_cell.east
-    while current_cell.north:
-        current_cell.piece = make_outline_piece()
-        current_cell = current_cell.north
-    while current_cell.west:
-        current_cell.piece = make_outline_piece()
-        current_cell = current_cell.west
-    while current_cell.south:
-        current_cell.piece = make_outline_piece()
-        current_cell = current_cell.south
+            if x == 0:
+                west_connector = EdgeConnector()
+            if x == width - 1:
+                east_connector = EdgeConnector()
+            if y == 0:
+                south_connector = EdgeConnector()
+            if y == height - 1:
+                north_connector = EdgeConnector()
+
+            if not north_connector:
+                north_connector_index = x + (y * width)
+                north_connector = SimpleConnector(
+                    horizontal_connector_permutation[north_connector_index]
+                )
+
+            if not east_connector:
+                east_connector_index = x + (y * (width - 1))
+                east_connector = SimpleConnector(
+                    vertical_connector_permutation[east_connector_index]
+                )
+
+            if not south_connector:
+                south_connector_index = x + ((y - 1) * width)
+                south_connector = SimpleConnector(
+                    horizontal_connector_permutation[south_connector_index]
+                )
+
+            if not west_connector:
+                west_connector_index = (x - 1) + (y * (width - 1))
+                west_connector = SimpleConnector(
+                    vertical_connector_permutation[west_connector_index]
+                )
+
+            piece = Piece(
+                north=north_connector,
+                east=east_connector,
+                south=south_connector,
+                west=west_connector,
+            )
+
+            pieces.append(piece)
+    visualisation.show_pieces(pieces)
+
+
+def get_amount_of_vertical_connectors(width, height):
+    return (width - 1) * height
+
+
+def get_amount_of_horizontal_connectors(width, height):
+    return width * (height - 1)
+
+
+def make_standard_puzzle(width, height):
+    amount_of_vertical_connectors = get_amount_of_vertical_connectors(
+        width=width, height=height
+    )
+    amount_of_horizontal_connectors = get_amount_of_horizontal_connectors(
+        width=width, height=height
+    )
+    amount_of_internal_connectors = (
+        amount_of_vertical_connectors + amount_of_horizontal_connectors
+    )
+
+    vertical_connector_permutation = list(range(1, amount_of_vertical_connectors + 1))
+    horizontal_connector_permutation = list(
+        range(amount_of_vertical_connectors + 1, amount_of_internal_connectors + 1)
+    )
+
+    return connectors_to_puzzle(
+        width,
+        height,
+        vertical_connector_permutation,
+        horizontal_connector_permutation,
+    )
+
+
+def make_diffusion_illusion_puzzle(width, height):
+    """
+    Creates a puzzle with exactly two solutions.
+    This allows a processen known as "diffusion illusion"
+    to paint two different images on the same puzzle.
+    """
+
+    amount_of_vertical_connectors = get_amount_of_vertical_connectors(
+        width=width, height=height
+    )
+    amount_of_horizontal_connectors = get_amount_of_horizontal_connectors(
+        width=width, height=height
+    )
+    amount_of_internal_connectors = (
+        amount_of_vertical_connectors + amount_of_horizontal_connectors
+    )
+    amount_of_duplicated_connectors = math.ceil(amount_of_internal_connectors / 2)
+    all_permutations = list(
+        itertools.permutations(range(1, amount_of_duplicated_connectors + 1))
+    )
+    print("len(all_permutations):", len(all_permutations))

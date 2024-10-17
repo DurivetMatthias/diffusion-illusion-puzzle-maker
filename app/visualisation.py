@@ -16,33 +16,33 @@ def get_color_for_connector(connector: Connector):
 
 
 def draw_piece(piece: Piece, offset_x=0, offset_y=0):
-    print("offset_x:", offset_x)
-    print("offset_y:", offset_y)
-    print("[0 + offset_x, 0 + offset_y]:", [0 + offset_x, 0 + offset_y])
-    print("[0 + offset_x, 1 + offset_y]:", [0 + offset_x, 1 + offset_y])
     # south
     plt.plot(
-        [0 + offset_x, 0 + offset_x],
-        [0 + offset_y, 1 + offset_y],
-        color=get_color_for_connector(piece.north),
+        [0 + offset_x, 1 + offset_x],
+        [0 + offset_y, 0 + offset_y],
+        color=get_color_for_connector(piece.south),
+        linewidth=5,
     )
     # east
     plt.plot(
-        [0 + offset_x, 1 + offset_x],
-        [1 + offset_y, 1 + offset_y],
+        [1 + offset_x, 1 + offset_x],
+        [0 + offset_y, 1 + offset_y],
         color=get_color_for_connector(piece.east),
+        linewidth=5,
     )
     # north
     plt.plot(
-        [1 + offset_x, 1 + offset_x],
-        [1 + offset_y, 0 + offset_y],
-        color=get_color_for_connector(piece.south),
+        [1 + offset_x, 0 + offset_x],
+        [1 + offset_y, 1 + offset_y],
+        color=get_color_for_connector(piece.north),
+        linewidth=5,
     )
     # west
     plt.plot(
-        [1 + offset_x, 0 + offset_x],
-        [0 + offset_y, 0 + offset_y],
+        [0 + offset_x, 0 + offset_x],
+        [1 + offset_y, 0 + offset_y],
         color=get_color_for_connector(piece.west),
+        linewidth=5,
     )
 
 
